@@ -74,3 +74,18 @@ function Layout({ children }: PropsWithChildren) {
     </>
   );
 }
+
+export function ErrorBoundary({ error }) {
+  console.log(error);
+
+  return (
+    <Document>
+      <Layout>
+        <div>
+          <h1>Error</h1>
+          <pre>{error.message}</pre>
+        </div>
+      </Layout>
+    </Document>
+  );
+}

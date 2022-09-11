@@ -1,30 +1,25 @@
+import type { LoaderFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
-type PostType = {
-  id: number;
+import { db } from "~/utils/db.server";
+
+type Post = {
+  id: string;
   title: string;
-  body: string;
+  createdAt: Date;
 };
 
-type DataType = {
-  posts: PostType[];
-};
+export const loader: LoaderFunction = async () => {
+  const posts = await db.post.findMany({
+    select: { id: true, title: true, createdAt: true },
+    orderBy: { createdAt: "desc" },
+  });
 
-export const loader = () => {
-  const data = {
-    posts: [
-      { id: 1, title: "Post 1", body: "This is test post 1" },
-      { id: 2, title: "Post 2", body: "This is test post 2" },
-      { id: 3, title: "Post 3", body: "This is test post 3" },
-      { id: 4, title: "Post 4", body: "This is test post 4" },
-    ] as PostType[],
-  };
-
-  return data as DataType;
+  return posts;
 };
 
 export default function PostItems() {
-  const { posts } = useLoaderData<DataType>();
+  const posts = useLoaderData<Post[]>();
 
   return (
     <div>
@@ -35,10 +30,11 @@ export default function PostItems() {
         </Link>
       </div>
       <ul className="posts-list">
-        {posts.map(({ id, title }) => (
+        {posts.map(({ id, title, createdAt }) => (
           <li key={id}>
             <Link to={id.toString()}>
               <h3>{title}</h3>
+              {new Date(createdAt).toLocaleString()}
             </Link>
           </li>
         ))}
